@@ -1,0 +1,1 @@
+**OpsPilot** is an AI operations agent for **Cartora**, a fictional e-commerce company. It can understand internal policies and business processes, answer customer questions, and take actions such as checking orders, processing refunds, cancelling orders, and handling payments.
