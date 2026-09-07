@@ -1,5 +1,9 @@
 from fastapi import APIRouter
 from services.service import service
+from pydantic import BaseModel
+
+class PaymentResponse(BaseModel):
+    pass
 
 
 router = APIRouter(prefix="/api/v1/payments")
