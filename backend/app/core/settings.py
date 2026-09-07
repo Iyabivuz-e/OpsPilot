@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "OpsPilot"
     ADMIN_EMAIL: EmailStr = "dio@cortora.it"
     API_KEY: SecretStr = "rubbish here"
-    DATABASE_URL: str 
+    DATABASE_URL: str
     APP_DOMAIN: str = "opspilot.com"
 
     CORS_ORIGINS: list[str] = ["Somethings", "other thing"]

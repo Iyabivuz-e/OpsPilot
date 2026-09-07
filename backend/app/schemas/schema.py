@@ -2,7 +2,7 @@ import uuid
 from enum import StrEnum
 from typing import List, Literal
 from pydantic import BaseModel, EmailStr, Field
-from helpers.code_generator import generate_id_code
+from backend.app.helpers.id_generator import generate_id_code
 
 
 class RefundReturnStatus(StrEnum):

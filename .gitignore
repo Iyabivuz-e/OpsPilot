@@ -3,3 +3,6 @@ phase1.md
 phase2_rag.md
 backend/.venv
 backend/app/.env
+.ruff_cache
+__pycache__
+.env

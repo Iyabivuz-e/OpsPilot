@@ -3,12 +3,14 @@ from api.v1 import orders_router, payments_router, refunds_router, returns_route
 from database.db import create_tables
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await create_tables()
 
     yield
-    
+
+
 print(f"the db is connected")
 
 app = FastAPI(lifespan=lifespan)
