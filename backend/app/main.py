@@ -1,11 +1,17 @@
 from fastapi import FastAPI
 from api.v1 import orders_router, payments_router, refunds_router, returns_router
-from database.db import get_db
+from database.db import create_tables
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await create_tables()
 
-print(f"the db is connected: {get_db()}")
+    yield
+    
+print(f"the db is connected")
 
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(orders_router)
 app.include_router(payments_router)
