@@ -1,24 +1,22 @@
 import os
 
-
 def generate_id_code(mode: str) -> str:
-    match mode:
-        case "payment":
-            mode = "PAY"
-        case "order":
-            mode = "ORD"
-        case "refund":
-            mode = "REF"
-        case "return":
-            mode = "RET"
-        case "case":
-            mode = "CASE"
-
+    prefixes = {
+        "payment": "PAY", 
+        "order": "ORD",
+        "refund": "REF", 
+        "return": "RET", 
+        "case": "CASE",
+    }
+    prefix = prefixes.get(mode)
+    
+    if prefix is None:
+        raise ValueError(f"Unknown mode")
+    
     code = os.urandom(3).hex().upper()
 
     if mode == None:
         return "Kindly put something"
 
-    full_code = f"CORTORA-{mode}-{code}"
+    return f"CORTORA-{prefix}-{code}"
 
-    return f"Code: {full_code}"
