@@ -6,3 +6,7 @@ backend/app/.env
 .ruff_cache
 __pycache__
 .env
+public/
+favicon.ico
+agents.md
+claude.md
