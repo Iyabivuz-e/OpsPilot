@@ -3,6 +3,7 @@ from models.models import User, Customer
 from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.schema import Login
 from core.settings import settings
+from helpers.errors import UserNotFoundError
 
 
 async def login(email: str, db: AsyncSession) -> Login:
@@ -14,6 +15,6 @@ async def login(email: str, db: AsyncSession) -> Login:
         user = result.scalar_one_or_none()
 
     if not user:
-        raise Exception("No user found")
+        raise UserNotFoundError()
 
     return user

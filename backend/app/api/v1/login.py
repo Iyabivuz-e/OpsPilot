@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import get_db
 from auth.jwt_token import create_jwt
 from schemas.schema import LoginRequest
+from helpers.errors import InvalidCredentialsError
 
 router = APIRouter(prefix="/api/v1/login")
 
@@ -15,7 +16,7 @@ async def handle_login(data: LoginRequest , session: AsyncSession = Depends(get_
     user = await login(data.email, session)
 
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise InvalidCredentialsError()
 
     token = await create_jwt(user)
 
