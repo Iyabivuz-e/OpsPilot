@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from api.v1 import (
     orders_router,
     payments_router,
@@ -7,6 +8,7 @@ from api.v1 import (
     login_router,
 )
 from database.db import create_tables
+from core.settings import settings
 from contextlib import asynccontextmanager
 
 
@@ -20,6 +22,14 @@ async def lifespan(app: FastAPI):
 print(f"the db is connected")
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware, 
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=settings.CORS_HEADERS,
+)
 
 app.include_router(orders_router)
 app.include_router(payments_router)

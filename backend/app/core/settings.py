@@ -3,7 +3,7 @@ from pydantic import SecretStr, EmailStr, PostgresDsn
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
     APP_NAME: str = "OpsPilot"
     ADMIN_EMAIL: EmailStr = "dio@cortora.it"
     API_KEY: SecretStr = "rubbish here"
