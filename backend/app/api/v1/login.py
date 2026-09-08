@@ -23,7 +23,9 @@ async def handle_login(data: LoginRequest , session: AsyncSession = Depends(get_
     return token
 
 
-@router.get("/logout")
-async def handle_logout():
-    # Implement logout logic here (e.g., invalidate the token)
-    return {"message": "Logged out successfully"}
+# @router.get("/logout")
+# async def handle_logout():
+#     # This would be implemented well with sessions.
+#     # i have to logout from the frontend by deleting the 
+#     # token from local storage even though its not optimal. - I would work on this later
+#     return {"message": "Logged out successfully"}

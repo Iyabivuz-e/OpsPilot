@@ -44,7 +44,6 @@ async def app_exception_handler(
             "error": {
                 "code": exc.code,
                 "message": exc.message,
-                "detail": exc.__dict__.get("detail", [])
             }
         }
     )
@@ -60,7 +59,6 @@ async def app_exception_handler(
             "error": {
                 "code": "VALIDATION_ERROR",
                 "message": "Invalid input",
-                "detail": exc.errors()
             }
         }
     )

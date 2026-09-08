@@ -14,7 +14,6 @@ type ApiError = {
     error: {
         code: string
         message: string
-        detail: any[]
     }
 }
 const Login = ({email}: LoginProps) => {
@@ -29,7 +28,7 @@ const Login = ({email}: LoginProps) => {
         setIsLoading(true)
 
         try {
-            const response = await axios.post("http://localhost:8000/api/v1/login", {
+            const response = await axios.post("http://localhost:8000/api/v1/auth/login", {
                 email: emailValue
             })
             console.log("Response", response.data)
@@ -42,9 +41,8 @@ const Login = ({email}: LoginProps) => {
                 const data = error.response?.data
                 console.log("Error Message", data?.error.message)
                 console.log("Error Code", data?.error.code)
-                console.log("Error Details", data?.error.detail)
 
-                setError(data?.error.message ?? "An error occurred")
+                setError(data?.error?.message ?? "An error occurred")
             }
         }finally{
 
