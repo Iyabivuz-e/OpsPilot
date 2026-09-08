@@ -2,7 +2,7 @@ import uuid
 from enum import StrEnum
 from typing import List, Literal
 from pydantic import BaseModel, EmailStr, Field
-from backend.app.helpers.id_generator import generate_id_code
+from helpers.id_generator import generate_id_code
 
 
 class RefundReturnStatus(StrEnum):
@@ -31,11 +31,20 @@ class PaymentStatus(StrEnum):
 
 
 ## Pydantic validations
+class Login(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    role: str | None = None
+    country: str | None = None
+
+
 class User(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: str
     email: EmailStr
     role: str
+    expr: str
 
 
 class Customer(BaseModel):
@@ -43,6 +52,7 @@ class Customer(BaseModel):
     name: str
     email: EmailStr
     country: str
+    expr: str
 
 
 class Order(BaseModel):

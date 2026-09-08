@@ -42,6 +42,7 @@ class Customer(Base):
 
 ## Orders for our company
 
+
 class Order(Base):
     __tablename__ = "orders"
 
@@ -100,7 +101,7 @@ class OrderStatusHistory(Base):
     old_status: Mapped[str] = mapped_column(String(100))
     new_status: Mapped[str] = mapped_column(String(100))
     changed_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True),
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
     changed_by: Mapped[int] = mapped_column(
@@ -128,11 +129,11 @@ class Return(Base):
     reason: Mapped[str] = mapped_column(String(500))
     status: Mapped[str] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True),
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
     updated_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True),
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
@@ -160,11 +161,11 @@ class Payment(Base):
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     status: Mapped[str] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True),
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
     updated_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True),
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
@@ -201,11 +202,11 @@ class Refund(Base):
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     status: Mapped[str] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True),
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
     updated_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True),
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
@@ -245,5 +246,5 @@ class AgentAction(Base):
     description: Mapped[str] = mapped_column(String(2000))
     status: Mapped[str] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(
-         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     API_KEY: SecretStr = "rubbish here"
     DATABASE_URL: str
     APP_DOMAIN: str = "opspilot.com"
+    DOMAIN_NAME: str = "@cortora.com"
+    JWT_SECRET: str = "mysecret_change_me_please"
+    JWT_ALGORITHM: str = "HS256"
 
     CORS_ORIGINS: list[str] = ["Somethings", "other thing"]
     CORS_ORIGINS_REGEX: str | None = None
