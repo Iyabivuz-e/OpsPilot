@@ -13,9 +13,12 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "mysecret_change_me_please"
     JWT_ALGORITHM: str = "HS256"
 
-    CORS_ORIGINS: list[str] = ["Somethings", "other thing"]
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+    ]
     CORS_ORIGINS_REGEX: str | None = None
-    CORS_HEADERS: list[str] = ["Somethings", "other thing"]
+    CORS_HEADERS: list[str] = ["*"]
 
     APP_VERSION: int = 1.0
 
