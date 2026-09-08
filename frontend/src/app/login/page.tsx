@@ -10,10 +10,17 @@ import { useRouter } from "next/navigation"
 type LoginProps = {
     email: string
 }
-
+type ApiError = {
+    error: {
+        code: string
+        message: string
+        detail: any[]
+    }
+}
 const Login = ({email}: LoginProps) => {
     const [emailValue, setEmailValue] = useState(email || "")
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     const router = useRouter()
 
@@ -30,14 +37,19 @@ const Login = ({email}: LoginProps) => {
             if (response.status == 200){
                 router.push('/dashboard')
             }
-        } catch (error: any) {
-            console.log(error.response?.status)
-            console.log(error.response?.data)
+        } catch (error) {
+            if (axios.isAxiosError<ApiError>(error)){
+                const data = error.response?.data
+                console.log("Error Message", data?.error.message)
+                console.log("Error Code", data?.error.code)
+                console.log("Error Details", data?.error.detail)
 
-            console.log("something happened")
+                setError(data?.error.message ?? "An error occurred")
+            }
+        }finally{
+
+            setIsLoading(false)
         }
-        // once all good
-        setIsLoading(false)
     }
 
     return (
@@ -73,6 +85,7 @@ const Login = ({email}: LoginProps) => {
                     {isLoading ? "Logging in..." : "Log in"}
                     </Button>
                 </form>
+                {error && <p className="text-red-500 mt-2">{error}</p>}
                 </Card>
             </div>
         </div>

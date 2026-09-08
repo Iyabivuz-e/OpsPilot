@@ -8,10 +8,10 @@ from auth.jwt_token import create_jwt
 from schemas.schema import LoginRequest
 from helpers.errors import InvalidCredentialsError
 
-router = APIRouter(prefix="/api/v1/login")
+router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
-@router.post("/")
+@router.post("/login")
 async def handle_login(data: LoginRequest , session: AsyncSession = Depends(get_db)):
     user = await login(data.email, session)
 
@@ -21,3 +21,9 @@ async def handle_login(data: LoginRequest , session: AsyncSession = Depends(get_
     token = await create_jwt(user)
 
     return token
+
+
+@router.get("/logout")
+async def handle_logout():
+    # Implement logout logic here (e.g., invalidate the token)
+    return {"message": "Logged out successfully"}
