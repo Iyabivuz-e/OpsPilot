@@ -30,7 +30,10 @@ const Login = ({email}: LoginProps) => {
             if (response.status == 200){
                 router.push('/dashboard')
             }
-        } catch (error) {
+        } catch (error: any) {
+            console.log(error.response?.status)
+            console.log(error.response?.data)
+
             console.log("something happened")
         }
         // once all good

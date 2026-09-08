@@ -6,7 +6,7 @@ from core.settings import settings
 
 
 async def login(email: str, db: AsyncSession) -> Login:
-    if email.endswith(settings.DOMAIN_NAME):
+    if email.endswith(settings.DOMAIN_NAME.lower()):
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
     else:

@@ -31,6 +31,9 @@ class PaymentStatus(StrEnum):
 
 
 ## Pydantic validations
+class LoginRequest(BaseModel):
+    email: EmailStr
+    
 class Login(BaseModel):
     id: int
     name: str
