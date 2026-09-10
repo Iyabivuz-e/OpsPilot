@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
 
     yield
 print(f"the db is connected")
+print(f"the vectordb is alsoconnected")
 
 
 app = FastAPI(lifespan=lifespan)

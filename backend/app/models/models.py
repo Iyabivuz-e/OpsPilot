@@ -2,8 +2,17 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import String, ForeignKey, Numeric, DateTime
 from datetime import datetime, timezone
 from decimal import Decimal
+from typing import Any
+from enum import Enum
+from sqlalchemy.dialects.postgresql import JSONB
+from pgvector.sqlalchemy import VECTOR
 
 
+class DocumentStatus(Enum):
+    PROCESSING = "processing" ## under injestion and not ready to be used by the llms(like still doing the embeddings, etc)
+    ACTIVE = "active" ## Ready to be used by the llms
+    ARCHIVED = "archived" ## No longer used by the llms(its an old version), only to keep history of the document
+    
 class Base(DeclarativeBase):
     pass
 
@@ -245,6 +254,46 @@ class AgentAction(Base):
     entity_id: Mapped[str] = mapped_column(String(100))
     description: Mapped[str] = mapped_column(String(2000))
     status: Mapped[str] = mapped_column(String(50))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+
+## Classes for the knowledge base of the company(for rag)
+class DocumentModel(Base):
+    __tablename__ = "document_models"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(255))
+    category: Mapped[str] = mapped_column(String(1000)) ## Where the document belongs to(say, returns, payments, etc)
+    department: Mapped[str] = mapped_column(String(1000)) ## Which department the document belongs to(say, customer support, finance, etc)
+    current_version_id: Mapped[int] = mapped_column(ForeignKey("document_versions.id"), index=True) # The ID of the current version of the document
+    role: Mapped[list[str]]  = mapped_column(String(1000))  ## The roles that can access this document. Multipe roles can be specified, separated by commas, and all roles can be specified by using "all"
+
+
+class DocumentVersion(Base):
+    __tablename__ = "document_versions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    document_id: Mapped[int] = mapped_column(ForeignKey("document_models.id"), index=True)
+    version_number: Mapped[int] = mapped_column()
+    content_hash: Mapped[str] = mapped_column(String(10000)) # This is used to check if the content has changed
+    status: Mapped [DocumentStatus] = mapped_column(String(50), default=DocumentStatus.PROCESSING) # checking for the current status of the document version
+    filename: Mapped[str] = mapped_column(String(1000)) # The name of the file that was uploaded
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+class Chunk(Base):
+    __tablename__ = "chunks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    document_version_id: Mapped[int] = mapped_column(ForeignKey("document_versions.id"), index=True)
+    chunk_index: Mapped[int] = mapped_column() # helpful to identify/keep the order of the chunks in the document version
+    content: Mapped[str] = mapped_column(String(10000)) # The content of the chunk
+    content_hash: Mapped[str] = mapped_column(String(10000)) # This is used to check if the content has changed
+    embedding: Mapped[list[float]] = mapped_column(VECTOR(1024)) # The embedding of the chunk
+    chunk_metadata:Mapped[dict[str, Any]] = mapped_column(JSONB)# We get them from the pipeline, and store them in the database for future use
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
