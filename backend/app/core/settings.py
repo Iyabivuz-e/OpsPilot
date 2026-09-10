@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: EmailStr = "dio@cortora.it"
     API_KEY: SecretStr = "rubbish here"
     DATABASE_URL: str
+    FILE_STORAGE_PATH: str = "some minio path"
     APP_DOMAIN: str = "opspilot.com"
     DOMAIN_NAME: str = "@cortora.com"
     JWT_SECRET: str = "mysecret_change_me_please"
