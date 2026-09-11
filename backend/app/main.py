@@ -13,6 +13,7 @@ from database.db import create_tables
 from core.settings import settings
 from contextlib import asynccontextmanager
 from helpers.errors import AppExceptions
+from rag.pipeline import pipeline
 
 
 @asynccontextmanager
@@ -75,3 +76,14 @@ app.include_router(login_router)
 @app.get("/health")
 async def health():
     return {"message": "The app is healthy"}
+
+
+# file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
+# try:
+#         sections = pipeline(file_path)
+#         print(f"Extracted and normalized document: {sections}")
+#         for section in sections:
+#             print(f"Section Title: {section.title}")
+#             print(f"Number of Elements: {len(section.elements)}")
+# except Exception as e:
+#         print(f"Error processing document: {e}")

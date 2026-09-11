@@ -23,4 +23,7 @@ class Document(BaseModel):
     metadata : dict[str, Any] 
     elements: list[Element]
     
-    
+class Section(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    elements: list[Element]
