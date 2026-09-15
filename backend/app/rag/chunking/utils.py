@@ -8,7 +8,7 @@ def build_chunk(document_id_version: str, chunk_index: int, section: Section, te
     # body = "\n\n".join(get_text(element) for element in elements)
     # content = f"{header}\n\n{body}" 
     
-    content = f"{section.title}\n\n{text}" if section.title else text ## I have an issue here with the text
+    content = f"{section.title}\n\n{text}" if section.title else text
 
     return Chunk(
        document_id_version=document_id_version,
