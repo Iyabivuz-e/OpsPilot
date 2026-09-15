@@ -25,5 +25,14 @@ class Document(BaseModel):
     
 class Section(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    title: str
+    title: str | None = None
     elements: list[Element]
+    
+class Chunk(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    document_id_version: str
+    chunk_index: int
+    content: str
+    content_hash: str
+    metadata: dict[str, Any]
+    tokens: int

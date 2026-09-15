@@ -16,6 +16,7 @@ from helpers.errors import AppExceptions
 from rag.pipeline import pipeline
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await create_tables()
@@ -78,12 +79,12 @@ async def health():
     return {"message": "The app is healthy"}
 
 
-# file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
-# try:
-#         sections = pipeline(file_path)
-#         print(f"Extracted and normalized document: {sections}")
-#         for section in sections:
-#             print(f"Section Title: {section.title}")
-#             print(f"Number of Elements: {len(section.elements)}")
-# except Exception as e:
-#         print(f"Error processing document: {e}")
+file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
+try:
+        chunks = pipeline(file_path)
+        print(f"Extracted and normalized document: {chunks}")
+        for chunk in chunks:
+            print(f"Section Title: {chunk.metadata.get('section_title')}")
+            print(f"Tokens each chunk: {chunk.tokens}")
+except Exception as e:
+        print(f"Error processing document: {e}")

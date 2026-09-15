@@ -11,9 +11,13 @@ class Settings(BaseSettings):
     FILE_STORAGE_PATH: str = "some minio path"
     APP_DOMAIN: str = "opspilot.com"
     DOMAIN_NAME: str = "@cortora.com"
+    # CHUNKING
+    MAX_TOKENS: int = 500
+    OVERLAP_TOKENS: int = 50
+    # Auth
     JWT_SECRET: str = "mysecret_change_me_please"
     JWT_ALGORITHM: str = "HS256"
-
+    # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:5173",

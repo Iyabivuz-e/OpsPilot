@@ -4,6 +4,7 @@ from helpers.mime_types import extension_to_mime
 from .extractors.normalizer import normalize_document
 from .extractors.registry import registry
 from helpers.build_section import build_sections
+from .chunking.chunk import chunk_sections 
 
 def pipeline(file_path: str) -> list[Section]:
     extension = os.path.splitext(file_path)[1].lower()
@@ -15,7 +16,7 @@ def pipeline(file_path: str) -> list[Section]:
     document = extractor.extract(file_path)
     document = normalize_document(document)
     sections = build_sections(document.elements)
-    # chunks = 
-    # embeddings = 
-    return sections
+    chunks = chunk_sections(document.id, sections)
+    # embeddings = embedd(chunks)
+    return chunks
     # return embeddings
