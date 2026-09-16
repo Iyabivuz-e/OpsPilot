@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from enum import Enum
-from typing import Any
+from typing import Any, List, Optional
 import uuid
 
 
@@ -15,6 +15,7 @@ class Element(BaseModel):
     type: ElementType = ElementType.PARAGRAPH
     text: str = ""
     page: int | None = None
+    bbox: Optional[List[float]] = None
     
 class Document(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

@@ -19,6 +19,9 @@ def build_chunk(document_id_version: str, chunk_index: int, section: Section, te
        metadata={
            "section_id": section.id,
            "section_title": section.title,
+           "bbox": section.elements[0].bbox if section.elements else None,
+           "page": section.elements[0].page if section.elements else None,
+           "element_ids": [element.id for element in section.elements],
            #"section_path": section.path,
         #    "element_ids": element_ids,
         #    "pages": pages,
