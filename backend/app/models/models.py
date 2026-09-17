@@ -293,6 +293,8 @@ class Chunk(Base):
     content: Mapped[str] = mapped_column(String(10000)) # The content of the chunk
     content_hash: Mapped[str] = mapped_column(String(10000)) # This is used to check if the content has changed
     embedding: Mapped[list[float]] = mapped_column(VECTOR(1024)) # The embedding of the chunk
+    # embedding_model: Mapped[str] = mapped_column(String(1000)) # The model used to generate the embedding
+    
     chunk_metadata:Mapped[dict[str, Any]] = mapped_column(JSONB)# We get them from the pipeline, and store them in the database for future use
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

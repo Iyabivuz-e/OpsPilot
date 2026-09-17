@@ -5,6 +5,7 @@ from .extractors.normalizer import normalize_document
 from .extractors.registry import registry
 from helpers.build_section import build_sections
 from .chunking.chunk import chunk_sections 
+from .embedding.embedding_worker import embedd_document_task
 
 def pipeline(file_path: str) -> list[Section]:
     extension = os.path.splitext(file_path)[1].lower()
@@ -17,6 +18,5 @@ def pipeline(file_path: str) -> list[Section]:
     document = normalize_document(document)
     sections = build_sections(document.elements)
     chunks = chunk_sections(document.id, sections)
-    # embeddings = embedd(chunks)
-    return chunks
-    # return embeddings
+    embeddings = embedd_document_task(document.id, chunks)
+    return embeddings

@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # Auth
     JWT_SECRET: str = "mysecret_change_me_please"
     JWT_ALGORITHM: str = "HS256"
+    
+    # EMBEDDINGS
+    EMBEDDINGS_MODEL: str = "BAAI/bge-small-en-v1.5"
     # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",

@@ -8,7 +8,7 @@ from schemas.document_schema import Element, Document
 
 def normalize_document(document: Document) -> Document:
     document.elements = [_normalize_text(element) for element in document.elements]
-    document.elements = [_remove_footer_and_header(element) for element in document.elements]
+    # document.elements = [_remove_footer_and_header(element) for element in document.elements]
     # document.elements = [_remove_duplicated_lines(element) for element in document.elements]
     document.elements = _remove_duplicated_lines(document.elements)
     return document

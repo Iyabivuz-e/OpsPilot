@@ -81,10 +81,10 @@ async def health():
 
 file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
 try:
-        chunks = pipeline(file_path)
-        print(f"Extracted and normalized document: {chunks}")
-        for chunk in chunks:
-            print(f"Section Title: {chunk.metadata.get('section_title')}")
-            print(f"Tokens each chunk: {chunk.tokens}")
+        embedded = pipeline(file_path)
+        print(f"Embeddings: {embedded}")
+        # for chunk in chunks:
+        #     print(f"Section Title: {chunk.metadata.get('section_title')}")
+        #     print(f"Tokens each chunk: {chunk.tokens}")
 except Exception as e:
         print(f"Error processing document: {e}")
