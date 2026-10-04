@@ -260,6 +260,13 @@ class AgentAction(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
+# The document blueprint
+class Document(Base):
+    __tablename__ = "documents"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    doc_metadata: Mapped[dict] = mapped_column(JSONB, nullable=True) # We get these from the pipeline
+    embeddings: Mapped[list[float]] = mapped_column(VECTOR(1024))
 
 ## Classes for the knowledge base of the company(for rag)
 class DocumentModel(Base):
@@ -300,7 +307,7 @@ class Chunk(Base):
     tsv: Mapped[str] = mapped_column(
         TSVECTOR,
         Computed("to_tsvector('english', content)", persisted=True),
-        deffered=True, # We dont fetch/load tsv vector verytime we chunk
+        deferred=True, # We dont fetch/load tsv vector verytime we chunk
     )
     __table_args__ = (
         Index("idx_chunks_tsv", "tsv", postgresql_using="gin"),

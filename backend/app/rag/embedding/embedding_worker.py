@@ -1,11 +1,20 @@
 import asyncio
+from fastapi import Depends
 from .embedding import Embedding, EmbeddingBacher
 from core.settings import settings
-
+# from sqlalchemy.orm import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
+from models.models import Document
+from database.db import get_db
 
 """ We will put this function in a background task"""
 
-def embedd_document_task(document_id, chunks, model_name=settings.EMBEDDINGS_MODEL):
+async def embedd_document_task(
+    document_id, 
+    chunks, 
+    db:AsyncSession = Depends(get_db), 
+    model_name=settings.EMBEDDINGS_MODEL):
+    
     embedding = Embedding(model_name)
     batcher = EmbeddingBacher(batch_size=64)
     
@@ -25,7 +34,19 @@ def embedd_document_task(document_id, chunks, model_name=settings.EMBEDDINGS_MOD
                     "metadata": chunk.metadata
                 })
             # Here we save it to thevector store(pgvector) --- later
-            return payloads
+            payload_sqlalchemy = []
+            for pl in payloads:
+                # We convert the payload dict into a SQLAlchemy Document
+                db_obj = Document(
+                    id=pl["id"],
+                    embeddings=pl["vector"],
+                    doc_metadata=pl["metadata"]
+                )
+                payload_sqlalchemy.append(db_obj)
+            db.add_all(payload_sqlalchemy)
+            await db.commit()
+            # return payloads
+        
         except Exception as e:
             # print(f"Failed to generate embeddings for document {document_id}: {e}")
             raise e
