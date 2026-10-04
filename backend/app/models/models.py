@@ -6,6 +6,8 @@ from typing import Any
 from enum import Enum
 from sqlalchemy.dialects.postgresql import JSONB
 from pgvector.sqlalchemy import VECTOR
+from sqlalchemy.dialects.postgresql import TSVECTOR, ARRAY
+from sqlalchemy import Computed, Index
 
 
 class DocumentStatus(Enum):
@@ -268,7 +270,7 @@ class DocumentModel(Base):
     category: Mapped[str] = mapped_column(String(1000)) ## Where the document belongs to(say, returns, payments, etc)
     department: Mapped[str] = mapped_column(String(1000)) ## Which department the document belongs to(say, customer support, finance, etc)
     current_version_id: Mapped[int] = mapped_column(ForeignKey("document_versions.id"), index=True) # The ID of the current version of the document
-    role: Mapped[list[str]]  = mapped_column(String(1000))  ## The roles that can access this document. Multipe roles can be specified, separated by commas, and all roles can be specified by using "all"
+    role: Mapped[list[str]]  = mapped_column(ARRAY(String(1000)))  ## The roles that can access this document. Multipe roles can be specified, separated by commas, and all roles can be specified by using "all"
 
 
 class DocumentVersion(Base):
@@ -294,7 +296,17 @@ class Chunk(Base):
     content_hash: Mapped[str] = mapped_column(String(10000)) # This is used to check if the content has changed
     embedding: Mapped[list[float]] = mapped_column(VECTOR(1024)) # The embedding of the chunk
     # embedding_model: Mapped[str] = mapped_column(String(1000)) # The model used to generate the embedding
-    
+    # Keyword-search index ccolumn
+    tsv: Mapped[str] = mapped_column(
+        TSVECTOR,
+        Computed("to_tsvector('english', content)", persisted=True),
+        deffered=True, # We dont fetch/load tsv vector verytime we chunk
+    )
+    __table_args__ = (
+        Index("idx_chunks_tsv", "tsv", postgresql_using="gin"),
+        Index("idx_chunks_embedding", "embedding", postgresql_using="ivfflat", # We can also use hnsw
+              postgresql_ops={"embedding": "vector_cosine_ops"}),
+    )
     chunk_metadata:Mapped[dict[str, Any]] = mapped_column(JSONB)# We get them from the pipeline, and store them in the database for future use
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
