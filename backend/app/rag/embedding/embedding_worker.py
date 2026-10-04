@@ -12,7 +12,7 @@ from database.db import get_db
 async def embedd_document_task(
     document_id, 
     chunks, 
-    db:AsyncSession = Depends(get_db), 
+    db: AsyncSession, 
     model_name=settings.EMBEDDINGS_MODEL):
     
     embedding = Embedding(model_name)
@@ -25,6 +25,10 @@ async def embedd_document_task(
         try:
             embeddings = embedding.embed(text_to_embedd)
             print(f"Generated embeddings for document {document_id}.")
+            print("embeddings type:", type(embeddings))
+            print("embeddings[0] type:", type(embeddings[0]))
+            print("embeddings[0] repr:", repr(embeddings[0])[:500])
+
             
             payloads = []
             for idx, chunk in enumerate(batch):
@@ -33,6 +37,8 @@ async def embedd_document_task(
                     "vector": embeddings[idx],
                     "metadata": chunk.metadata
                 })
+            print(type(embeddings[idx]))
+            print(embeddings[idx][:5])
             # Here we save it to thevector store(pgvector) --- later
             payload_sqlalchemy = []
             for pl in payloads:
@@ -42,6 +48,7 @@ async def embedd_document_task(
                     embeddings=pl["vector"],
                     doc_metadata=pl["metadata"]
                 )
+
                 payload_sqlalchemy.append(db_obj)
             db.add_all(payload_sqlalchemy)
             await db.commit()

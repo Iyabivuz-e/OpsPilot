@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
+from database.db import get_db
 from api.v1 import (
     orders_router,
     payments_router,
@@ -79,12 +81,20 @@ async def health():
     return {"message": "The app is healthy"}
 
 
-file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
-try:
-        embedded = pipeline(file_path)
-        print(f"Embeddings: {embedded}")
-        # for chunk in chunks:
-        #     print(f"Section Title: {chunk.metadata.get('section_title')}")
-        #     print(f"Tokens each chunk: {chunk.tokens}")
-except Exception as e:
-        print(f"Error processing document: {e}")
+
+
+@app.get("/pipeline")
+async def run_pipeline(db: AsyncSession = Depends(get_db)):
+    try:
+        file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
+        search_results = await pipeline(file_path, db=db)
+        return {"search_results": search_results}
+    except Exception as e:
+        return {"error": str(e)}
+
+# file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
+# try:
+#         search_results = pipeline(file_path)
+#         print(f"Search Results: {search_results}")
+# except Exception as e:
+#         print(f"Error processing document: {e}")

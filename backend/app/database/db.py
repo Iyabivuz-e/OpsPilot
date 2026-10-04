@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from core.settings import settings
 from models.models import Base
-from pgvector.asyncpg import register_vector
+# from pgvector.asyncpg import register_vector
 from sqlalchemy import event
 
 
@@ -17,9 +17,22 @@ engine = create_async_engine(
 )
 
 ## We need to register the pgvector extension with the database connection.
-@event.listens_for(engine.sync_engine, "connect") 
-def register_pgvector(dbapi_connection, connection_record): 
-    dbapi_connection.run_async(register_vector)
+# @event.listens_for(engine.sync_engine, "connect") 
+@event.listens_for(engine.sync_engine, "connect")
+def register_vector_codec(dbapi_connection, connection_record):
+    dbapi_connection.run_async(
+        lambda conn: conn.set_type_codec(
+            "vector",
+            schema="public",          # where the pgvector extension is installed
+            encoder=lambda value: value,   # SQLAlchemy already gives a '[...]' string
+            decoder=lambda value: value,   # pgvector's result processor parses it back
+            format="text",
+        )
+    )
+
+
+# def register_pgvector(dbapi_connection, connection_record): 
+#     dbapi_connection.run_async()
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,

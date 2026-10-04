@@ -14,7 +14,8 @@ class DocumentStatus(Enum):
     PROCESSING = "processing" ## under injestion and not ready to be used by the llms(like still doing the embeddings, etc)
     ACTIVE = "active" ## Ready to be used by the llms
     ARCHIVED = "archived" ## No longer used by the llms(its an old version), only to keep history of the document
-    
+        
+
 class Base(DeclarativeBase):
     pass
 
@@ -264,9 +265,9 @@ class AgentAction(Base):
 class Document(Base):
     __tablename__ = "documents"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(String(1000),primary_key=True)
     doc_metadata: Mapped[dict] = mapped_column(JSONB, nullable=True) # We get these from the pipeline
-    embeddings: Mapped[list[float]] = mapped_column(VECTOR(1024))
+    embeddings: Mapped[list[float]] = mapped_column(VECTOR(384))
 
 ## Classes for the knowledge base of the company(for rag)
 class DocumentModel(Base):
@@ -301,7 +302,7 @@ class Chunk(Base):
     chunk_index: Mapped[int] = mapped_column() # helpful to identify/keep the order of the chunks in the document version
     content: Mapped[str] = mapped_column(String(10000)) # The content of the chunk
     content_hash: Mapped[str] = mapped_column(String(10000)) # This is used to check if the content has changed
-    embedding: Mapped[list[float]] = mapped_column(VECTOR(1024)) # The embedding of the chunk
+    embedding: Mapped[list[float]] = mapped_column(VECTOR(384)) # The embedding of the chunk
     # embedding_model: Mapped[str] = mapped_column(String(1000)) # The model used to generate the embedding
     # Keyword-search index ccolumn
     tsv: Mapped[str] = mapped_column(

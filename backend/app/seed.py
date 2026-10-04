@@ -6,8 +6,8 @@ from decimal import Decimal
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.db import AsyncSessionLocal
-from app.models.models import (
+from database.db import AsyncSessionLocal
+from models.models import (
     User,
     Customer,
     Order,
@@ -16,7 +16,7 @@ from app.models.models import (
     Return,
 )
 
-from app.helpers.id_generator import generate_id_code
+from helpers.id_generator import generate_id_code
 
 
 # ============================================================
