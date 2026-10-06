@@ -14,7 +14,7 @@ def allowed_chunks():
         ).join(
             DocumentModel, DocumentModel.current_version_id == DocumentVersion.document_id
         ).where(
-            DocumentVersion.status == DocumentStatus.ACTIVE)
+            DocumentVersion.status == DocumentStatus.ACTIVE.value)
     )
     
 
@@ -32,15 +32,15 @@ async def hybrid_search(
     ## Similarity search with embeddings
     vector_hits = (
             base.order_by(
-            Chunk.embedding.cosine_distance(embedding_fn(query)).asc().limit(candidates)
-        )
+            Chunk.embedding.cosine_distance(embedding_fn(query)).asc()
+        ).limit(candidates)
     )
     
     ## Keyword search with tsvector
     tsquery = func.websearch_to_tsquery('english', query)
     keyword_hits = (
             base.order_by(
-                Chunk.tsv.op('@@')(tsquery).order
+                Chunk.tsv.op('@@')(tsquery)
         ).order_by(
             func.ts_rank_cd(Chunk.tsv, tsquery).desc()
         ).limit(candidates)
@@ -49,8 +49,8 @@ async def hybrid_search(
     vector_docs = await db.execute(vector_hits)
     keyword_docs = await db.execute(keyword_hits)
     
-    print("Vector docs: ", vector_docs)
-    print("Keyword docs: ", keyword_docs)
+    # print("Vector docs: ", vector_docs)
+    # print("Keyword docs: ", keyword_docs)
     
     ## Reciprocal Rank Fusion (RRF) to combine the results from both searches
     scores, rows = {}, {}

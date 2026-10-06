@@ -8,6 +8,8 @@ from helpers.build_section import build_sections
 from .chunking.chunk import chunk_sections 
 from .embedding.embedding_worker import embedd_document_task
 from .retrieval.hybrid_search import hybrid_search
+from core.settings import settings
+from .embedding.embedding import Embedding
 
 async def pipeline(file_path: str, db: AsyncSession) -> list[Section]:
     extension = os.path.splitext(file_path)[1].lower()
@@ -15,13 +17,15 @@ async def pipeline(file_path: str, db: AsyncSession) -> list[Section]:
     if not mime_type:
         raise ValueError(f"Unsupported file extension: {extension}")
     
+    embedding_model = Embedding(settings.EMBEDDINGS_MODEL)
+    
     extractor = registry.get_extractor(mime_type)
     document = extractor.extract(file_path)
     document = normalize_document(document)
     sections = build_sections(document.elements)
     chunks = chunk_sections(document.id, sections)
     embeddings = await embedd_document_task(document.id, chunks, db=db)
-    search = await hybrid_search("example query", embedding_fn=embeddings, db=db)
+    search = await hybrid_search("Refund already completed", embedding_fn=embedding_model.embed, db=db)
     # return embeddings
     
     ## Run the pipeline with a sample file path

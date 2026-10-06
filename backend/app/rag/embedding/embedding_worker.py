@@ -4,7 +4,7 @@ from .embedding import Embedding, EmbeddingBacher
 from core.settings import settings
 # from sqlalchemy.orm import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.models import Document
+from models.models import Document, Chunk
 from database.db import get_db
 
 """ We will put this function in a background task"""
@@ -24,11 +24,6 @@ async def embedd_document_task(
         
         try:
             embeddings = embedding.embed(text_to_embedd)
-            print(f"Generated embeddings for document {document_id}.")
-            print("embeddings type:", type(embeddings))
-            print("embeddings[0] type:", type(embeddings[0]))
-            print("embeddings[0] repr:", repr(embeddings[0])[:500])
-
             
             payloads = []
             for idx, chunk in enumerate(batch):
@@ -43,16 +38,23 @@ async def embedd_document_task(
             payload_sqlalchemy = []
             for pl in payloads:
                 # We convert the payload dict into a SQLAlchemy Document
-                db_obj = Document(
+                # db_obj = Document(
+                #     id=pl["id"],
+                #     embeddings=pl["vector"],
+                #     doc_metadata=pl["metadata"]
+                # )
+                db_obj = Chunk(
                     id=pl["id"],
                     embeddings=pl["vector"],
                     doc_metadata=pl["metadata"]
                 )
+                
 
                 payload_sqlalchemy.append(db_obj)
             db.add_all(payload_sqlalchemy)
             await db.commit()
-            # return payloads
+            
+            return payload_sqlalchemy
         
         except Exception as e:
             # print(f"Failed to generate embeddings for document {document_id}: {e}")
