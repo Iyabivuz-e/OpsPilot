@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "mysecret_change_me_please"
     JWT_ALGORITHM: str = "HS256"
     
+    #Files upload
+    FILESIZE: str = "100MB"
+    UPLOAD_PATH: str = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/uploads"
+    
     # EMBEDDINGS
     EMBEDDINGS_MODEL: str = "BAAI/bge-small-en-v1.5"
     # CORS

@@ -10,6 +10,7 @@ from api.v1 import (
     refunds_router,
     returns_router,
     login_router,
+    ingestion_router
 )
 from database.db import create_tables
 from core.settings import settings
@@ -74,6 +75,7 @@ app.include_router(payments_router)
 app.include_router(refunds_router)
 app.include_router(returns_router)
 app.include_router(login_router)
+app.include_router(ingestion_router)
 
 
 @app.get("/health")

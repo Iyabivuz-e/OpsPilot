@@ -278,7 +278,7 @@ class DocumentModel(Base):
     category: Mapped[str] = mapped_column(String(1000)) ## Where the document belongs to(say, returns, payments, etc)
     department: Mapped[str] = mapped_column(String(1000)) ## Which department the document belongs to(say, customer support, finance, etc)
     current_version_id: Mapped[int] = mapped_column(ForeignKey("document_versions.id"), index=True, nullable=True) # The ID of the current version of the document
-    role: Mapped[list[str]]  = mapped_column(ARRAY(String(1000)))  ## The roles that can access this document. Multipe roles can be specified, separated by commas, and all roles can be specified by using "all"
+    role: Mapped[list[str]]  = mapped_column(ARRAY(String(1000)), nullable=True)  ## The roles that can access this document. Multipe roles can be specified, separated by commas, and all roles can be specified by using "all"
 
 
 class DocumentVersion(Base):
