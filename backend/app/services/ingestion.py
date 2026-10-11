@@ -88,7 +88,7 @@ async def ingest_documents(doc: UploadFile, category, department, db: AsyncSessi
         
         "message": "Document ingested successfully",
         "document_id": document_model.id,
-        "version_id": document_version.id,
+        "version_id": document_version.version_number,
         "filename": doc.filename,
         "category": category,
         "department": department,
