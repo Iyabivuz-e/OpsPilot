@@ -31,9 +31,9 @@ class Section(BaseModel):
     
 class Chunk(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    document_id_version: str
+    document_version_id: str
     chunk_index: int
     content: str
     content_hash: str
-    metadata: dict[str, Any]
+    chunk_metadata: dict[str, Any]
     tokens: int

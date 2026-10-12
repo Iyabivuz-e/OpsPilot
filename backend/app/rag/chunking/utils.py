@@ -2,21 +2,17 @@ from schemas.document_schema import Chunk, Section, Element, ElementType
 from core.settings import settings
 import hashlib
 
-def build_chunk(document_id_version: str, chunk_index: int, section: Section, text: str) -> Chunk:
+def build_chunk(document_version_id: str, chunk_index: int, section: Section, text: str) -> Chunk:
     ## We check for the content of the section and get the chunks
-    # header = build_header(section)
-    # body = "\n\n".join(get_text(element) for element in elements)
-    # content = f"{header}\n\n{body}" 
-    
     content = f"{section.title}\n\n{text}" if section.title else text
 
     return Chunk(
-       document_id_version=document_id_version,
+       document_version_id=document_version_id,
        chunk_index=chunk_index,
        content=content,
        content_hash=hash_content(content),
        tokens=count_tokens(content),
-       metadata={
+       chunk_metadata={
            "section_id": section.id,
            "section_title": section.title,
            "bbox": section.elements[0].bbox if section.elements else None,

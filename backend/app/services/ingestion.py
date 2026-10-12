@@ -10,6 +10,8 @@ from rag.chunking.utils import hash_content
 from models.models import DocumentModel, DocumentVersion, DocumentStatus
 from pathlib import Path
 from helpers.document_validator import DocumentValidator
+from rag.pipeline import pipeline
+
 
 validator = DocumentValidator(max_size=int(settings.FILESIZE[:-2]) * 1024 * 1024)  # Convert MB to bytes
 
@@ -20,9 +22,10 @@ async def ingest_documents(doc: UploadFile, category, department, db: AsyncSessi
     upload_path.mkdir(parents=True, exist_ok=True)
     
     file_ext = Path(doc.filename).suffix
-    unique_filename = f"{uuid.uuid4()}{file_ext}" ## custom filename to avoid conflicts
-    file_path = upload_path / unique_filename
-
+    filename = Path(doc.filename).name
+    # unique_filename = f"{uuid.uuid4()}{file_ext}" ## custom filename to avoid conflicts
+    file_path = upload_path / doc.filename
+    
     
     if ( doc is None or not category.strip() or not department.strip()):
         raise HTTPException(
@@ -74,7 +77,16 @@ async def ingest_documents(doc: UploadFile, category, department, db: AsyncSessi
         )
         
         db.add(document_version)
+        await db.flush()  # Ensure the document_version gets an ID before proceeding
+        document_model.current_version_id = document_version.id  # Set the current version ID
+        
         await db.commit()
+        
+        saved_chunks = await pipeline(
+            file_path=str(file_path), 
+            document_version_id=document_version.id, 
+            db=db
+        )
         
     except Exception as e:
         await db.rollback()

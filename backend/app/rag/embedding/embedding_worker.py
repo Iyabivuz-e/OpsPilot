@@ -1,16 +1,13 @@
-import asyncio
-from fastapi import Depends
 from .embedding import Embedding, EmbeddingBacher
 from core.settings import settings
-# from sqlalchemy.orm import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.models import Document, Chunk
-from database.db import get_db
+from models.models import Chunk
+from uuid import UUID
 
 """ We will put this function in a background task"""
 
 async def embedd_document_task(
-    document_id, 
+    document_version_id, 
     chunks, 
     db: AsyncSession, 
     model_name=settings.EMBEDDINGS_MODEL):
@@ -20,7 +17,6 @@ async def embedd_document_task(
     
     for batch in batcher.get_batches(chunks):
         text_to_embedd = [chunk.content for chunk in batch]
-        # print(f"text to embedd {len(text_to_embedd)} for document {document_id}.")
         
         try:
             embeddings = embedding.embed(text_to_embedd)
@@ -28,35 +24,35 @@ async def embedd_document_task(
             payloads = []
             for idx, chunk in enumerate(batch):
                 payloads.append({
-                    "id": f"{document_id}_{chunk.chunk_index}",
-                    "vector": embeddings[idx],
-                    "metadata": chunk.metadata
+                    "id": chunk.id,
+                    "document_version_id": chunk.document_version_id,
+                    "chunk_index": chunk.chunk_index,
+                    "content": chunk.content,
+                    "content_hash": chunk.content_hash,
+                    "embedding": embeddings[idx],
+                    "chunk_metadata": chunk.chunk_metadata
                 })
             print(type(embeddings[idx]))
             print(embeddings[idx][:5])
-            # Here we save it to thevector store(pgvector) --- later
             payload_sqlalchemy = []
             for pl in payloads:
                 # We convert the payload dict into a SQLAlchemy Document
-                # db_obj = Document(
-                #     id=pl["id"],
-                #     embeddings=pl["vector"],
-                #     doc_metadata=pl["metadata"]
-                # )
                 db_obj = Chunk(
-                    id=pl["id"],
-                    embeddings=pl["vector"],
-                    doc_metadata=pl["metadata"]
+                    id=UUID(pl["id"]),
+                    document_version_id=pl["document_version_id"],
+                    chunk_index=pl["chunk_index"],
+                    content=pl["content"],
+                    content_hash=pl["content_hash"],
+                    embedding=pl["embedding"],
+                    chunk_metadata=pl["chunk_metadata"]
                 )
                 
 
                 payload_sqlalchemy.append(db_obj)
             db.add_all(payload_sqlalchemy)
-            await db.commit()
+            await db.flush()
             
             return payload_sqlalchemy
         
         except Exception as e:
-            # print(f"Failed to generate embeddings for document {document_id}: {e}")
             raise e
-    # print(f"the payloads{len(payloads)} for document {document_id}.")

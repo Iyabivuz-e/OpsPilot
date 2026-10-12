@@ -1,8 +1,10 @@
+from pathlib import Path
 from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from database.db import get_db
 from api.v1 import (
     orders_router,
@@ -10,13 +12,13 @@ from api.v1 import (
     refunds_router,
     returns_router,
     login_router,
-    ingestion_router
+    ingestion_router,
+    chat_router,
 )
 from database.db import create_tables
 from core.settings import settings
 from contextlib import asynccontextmanager
 from helpers.errors import AppExceptions
-from rag.pipeline import pipeline
 
 
 
@@ -76,6 +78,7 @@ app.include_router(refunds_router)
 app.include_router(returns_router)
 app.include_router(login_router)
 app.include_router(ingestion_router)
+app.include_router(chat_router)
 
 
 @app.get("/health")
@@ -83,20 +86,3 @@ async def health():
     return {"message": "The app is healthy"}
 
 
-
-
-@app.get("/pipeline")
-async def run_pipeline(db: AsyncSession = Depends(get_db)):
-    try:
-        file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
-        search_results = await pipeline(file_path, db=db)
-        return {"search_results": search_results}
-    except Exception as e:
-        return {"error": str(e)}
-
-# file_path = "/Users/dieudonne/Developer/BIP/OpsPilot/OpsPilot/cortora_docs/employee-handbook.pdf"  # Replace with your file path
-# try:
-#         search_results = pipeline(file_path)
-#         print(f"Search Results: {search_results}")
-# except Exception as e:
-#         print(f"Error processing document: {e}")
