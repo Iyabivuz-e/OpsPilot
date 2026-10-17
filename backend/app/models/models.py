@@ -16,6 +16,15 @@ class DocumentStatus(Enum):
     ACTIVE = "active" ## Ready to be used by the llms
     ARCHIVED = "archived" ## No longer used by the llms(its an old version), only to keep history of the document
         
+class ChatRole(Enum):
+    USER = "user"
+    ASSISTANT = "assistant"
+    SYSTEM = "system"
+    
+class ChatStatus(Enum):
+    PENDING = "pending"
+    COMPLETED = "completed"
+    FAILED = "failed"
 
 class Base(DeclarativeBase):
     pass
@@ -319,4 +328,27 @@ class Chunk(Base):
     chunk_metadata:Mapped[dict[str, Any]] = mapped_column(JSONB)# We get them from the pipeline, and store them in the database for future use
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+ 
+class Conversation(Base):
+    __tablename__ = "conversations"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    title: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    
+    )
+    
+class Message(Base):
+    __tablename__ = "messages"
+    
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    conversation_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("conversations.id"), index=True)
+    role: Mapped[ChatRole] = mapped_column(String(50), default=ChatRole.USER)
+    content: Mapped[str] = mapped_column(String(10000))
+    status: Mapped[ChatStatus] = mapped_column(String(50), default=ChatStatus.PENDING)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
     )

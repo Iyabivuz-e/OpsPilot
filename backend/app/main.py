@@ -14,6 +14,7 @@ from api.v1 import (
     login_router,
     ingestion_router,
     chat_router,
+    customer_router,
 )
 from database.db import create_tables
 from core.settings import settings
@@ -79,6 +80,7 @@ app.include_router(returns_router)
 app.include_router(login_router)
 app.include_router(ingestion_router)
 app.include_router(chat_router)
+app.include_router(customer_router)
 
 
 @app.get("/health")
