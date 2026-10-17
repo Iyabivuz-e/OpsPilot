@@ -16,6 +16,7 @@ from api.v1 import (
     chat_router,
     customer_router,
     user_router,
+    profile_router,
     
 )
 from database.db import create_tables
@@ -84,6 +85,7 @@ app.include_router(ingestion_router)
 app.include_router(chat_router)
 app.include_router(customer_router)
 app.include_router(user_router)
+app.include_router(profile_router)
 
 
 @app.get("/health")
