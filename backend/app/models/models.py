@@ -1,5 +1,5 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import String, ForeignKey, Numeric, DateTime
+from sqlalchemy import String, ForeignKey, Numeric, DateTime, Computed, Index, Text
 from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any
@@ -8,8 +8,6 @@ import uuid
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from pgvector.sqlalchemy import VECTOR
 from sqlalchemy.dialects.postgresql import TSVECTOR, ARRAY
-from sqlalchemy import Computed, Index
-
 
 class DocumentStatus(Enum):
     PROCESSING = "processing" ## under injestion and not ready to be used by the llms(like still doing the embeddings, etc)
@@ -330,25 +328,110 @@ class Chunk(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
  
+
+# import uuid
+# from datetime import datetime, timezone
+
+# from sqlalchemy import (
+#     DateTime,
+#     ForeignKey,
+#     Index,
+#     String,
+#     Text,
+# )
+# from sqlalchemy.dialects.postgresql import UUID
+# from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
 class Conversation(Base):
     __tablename__ = "conversations"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
-    title: Mapped[str] = mapped_column(String(255))
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
-    
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
     )
-    
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    title: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        default="New conversation",
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    messages: Mapped[list["Message"]] = relationship(
+        back_populates="conversation",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+
 class Message(Base):
     __tablename__ = "messages"
-    
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    conversation_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("conversations.id"), index=True)
-    role: Mapped[ChatRole] = mapped_column(String(50), default=ChatRole.USER)
-    content: Mapped[str] = mapped_column(String(10000))
-    status: Mapped[ChatStatus] = mapped_column(String(50), default=ChatStatus.PENDING)
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("conversations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    role: Mapped[ChatRole] = mapped_column(
+        String(50),
+        nullable=False,
+        default=ChatRole.USER,
+    )
+
+    content: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    status: Mapped[ChatStatus] = mapped_column(
+        String(50),
+        nullable=False,
+        default=ChatStatus.PENDING,
+    )
+
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    conversation: Mapped["Conversation"] = relationship(
+        back_populates="messages",
+    )
+
+    __table_args__ = (
+        Index(
+            "ix_messages_conversation_created",
+            "conversation_id",
+            "created_at",
+        ),
     )

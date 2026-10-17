@@ -1,12 +1,10 @@
 
-import jwt
 from auth.jwt_token import decode_jwt
 from fastapi import Header, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import get_db
 from models.models import User
 from sqlalchemy import select
-from uuid import UUID
 
 async def get_current_user(
     authorization: str = Header(..., description="Authorization header with Bearer token"),
