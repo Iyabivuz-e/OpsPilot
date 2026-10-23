@@ -14,3 +14,8 @@ class ConversationResponse(BaseModel):
     messages: list[MessageResponse] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
+    
+class ChatRequest(BaseModel):
+    message: str
+    conversation_id: UUID | None = None
+    model : str 
