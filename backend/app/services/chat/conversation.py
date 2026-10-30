@@ -24,13 +24,7 @@ async def create_conversation(
     await db.commit()
     await db.refresh(conversation)
     
-    return ConversationResponse(
-        conversation_id=conversation.id,
-        title=conversation.title,
-        messages=[],
-        created_at=conversation.created_at,
-        updated_at=conversation.updated_at
-    )
+    return conversation
     
     # return {"conversation_id": new_conversation_id}
 
@@ -120,5 +114,21 @@ async def get_conversation(
         created_at=conversation.created_at,
         updated_at=conversation.updated_at,
     )
+    
+     
+async def get_conversation_history(conversation_id: UUID, db: AsyncSession = Depends(get_db), limit=10) -> list[MessageResponse]:
+    """
+    Retrieve the conversation history for a specific conversation.
+    """
+    results = await db.execute(
+        select(Message)
+        .where(Message.conversation_id == conversation_id)
+        .order_by(Message.created_at.asc(), Message.id.asc())
+        .limit(limit)
+    )
+    
+    messages = results.scalars().all()
+    
+    return messages
 
 

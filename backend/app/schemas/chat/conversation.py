@@ -18,4 +18,4 @@ class ConversationResponse(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     conversation_id: UUID | None = None
-    model : str 
+    model : str = "openai/gpt-oss-120b" 

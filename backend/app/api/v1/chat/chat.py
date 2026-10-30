@@ -3,11 +3,15 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import get_db
 # from pydantic import BaseModel
-from services.chat.conversation import create_conversation, get_conversations, get_conversation
+from services.chat.conversation import (
+    create_conversation,
+    get_conversations, 
+    get_conversation, 
+    get_conversation_history
+)
 from models.models import Customer
 from helpers.current_logged import get_current_user
 from schemas.chat.conversation import ChatRequest
-from services.chat.generate import generate_answers
 from models.models import Conversation
 1
 
@@ -32,9 +36,7 @@ async def stream_chat_response(
     # Check if the user has wtitten anything.
     if not payload.message.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
-
-    if not payload.model:
-        raise HTTPException(status_code=400, detail="The model is missing.")
+    
 
     # Get the conversation id to be checked against the use when streaming
     if payload.conversation_id is not None:
@@ -42,23 +44,14 @@ async def stream_chat_response(
             conversation_id=payload.conversation_id, 
             current_user=current_user,
             db=db)
-        
-    if not conv:
-        raise HTTPException(status_code=404, detail="The conversation cannot be found")
     else:
-        # Create a new conversation for the user -- this will be used when streaming
-        conv = Conversation(
-            user_id=current_user.id,
-            title="New Conv"
-        )
-        
-        db.add(conv)
-        await db.commit()
-        await db.refresh(conv)
+        conv = await create_conversation(
+            user_id=current_user,
+            db=db)
         
     # Get the history conversation of the current user.    
-    conversation_history = await get_conversations(
-        current_user=current_user, 
+    conversation_history = await get_conversation_history(
+        conversation_id=conv.id, 
         db=db
     )
     
@@ -68,7 +61,8 @@ async def stream_chat_response(
     return StreamingResponse(
         generate_answers(
             query=payload.message, 
-            conversation_history=conversation_history
+            conversation_history=conversation_history, 
+            db=db
         ),
         media_type="text/event-stream",
         headers={
