@@ -10,7 +10,7 @@ from api.v1 import (
     orders_router,
     payments_router,
     refunds_router,
-    returns_router,
+    # returns_router,
     login_router,
     ingestion_router,
     chat_router,
@@ -79,7 +79,7 @@ async def app_exception_handler(
 app.include_router(orders_router)
 app.include_router(payments_router)
 app.include_router(refunds_router)
-app.include_router(returns_router)
+# app.include_router(returns_router)
 app.include_router(login_router)
 app.include_router(ingestion_router)
 app.include_router(chat_router)

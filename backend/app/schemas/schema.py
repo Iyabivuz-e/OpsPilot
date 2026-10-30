@@ -1,8 +1,10 @@
 import uuid
 from enum import StrEnum
 from typing import List, Literal
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from helpers.id_generator import generate_id_code
+from decimal import Decimal
+from datetime import datetime
 
 
 class RefundReturnStatus(StrEnum):
@@ -57,6 +59,17 @@ class Customer(BaseModel):
     country: str
     expr: str
 
+
+class OrderResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    order_id: str
+    customer_id: uuid.UUID
+    total: Decimal
+    status: str
+    created_at: datetime
+    updated_at: datetime
 
 class Order(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
